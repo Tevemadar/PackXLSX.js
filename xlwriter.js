@@ -61,8 +61,12 @@ function doXl(sheet) {
                 else if (cell.startsWith("="))
                     sheet_data += `"><f>${cell.substring(1)}</f>`;
                 else {
-                    sheet_data += `" t="s"><v>${string_table.length}</v>`;
-                    string_table.push(cell);
+                    let idx = string_table.indexOf(cell);
+                    if(idx === -1) {
+                        idx = string_table.length;
+                        string_table.push(cell);
+                    }
+                    sheet_data += `" t="s"><v>${idx}</v>`;
                 }
                 sheet_data += "</c>";
             }
