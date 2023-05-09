@@ -8,7 +8,12 @@
         <script src="xlwriter.js"></script>
         <script>
             function doThing() {
-                const blob = doXl([["Hello", , "Word!"], , [2, 3.5, "=A3*B3"], "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.".split("")]);
+//                const blob = doXl([["Hello", , "Word!"], , [2, 3.5, "=A3*B3"], "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.".split("")]);
+                const blob = doXl([
+                    ["Trallala", ["Hello", , "Word!"], , [2, 3.5, "=A3*B3"]],
+                    [["Lorem"],[4,5,"=A2*B3-A3*B2"],[6,7]],
+                    ["Ipsum",["Lorem"],"Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.".split("")]
+                ]);
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
