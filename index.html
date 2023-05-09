@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/gh/Tevemadar/ZipStore.js/zipstore.min.js"></script>
+        <script src="xlwriter.js"></script>
+        <script>
+//            function doThing(){
+//                const te = new TextEncoder();
+//                const date = new Date;
+//                const blob = zipstore([{name:"hello.txt",date:new Date,data:te.encode("Hello Word!")}]);
+//                const url = URL.createObjectURL(blob);
+//                const a = document.createElement("a");
+//                a.href = url;
+//                a.download = "test.zip";
+//                a.click();
+//                URL.revokeObjectURL(url);
+//            }
+
+            function doThing() {
+                const blob = doXl([["Hello", , "Word!"], , [2, 3.5, "=A3*B3"], "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.".split("")]);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "test.xlsx";
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        </script>
+    </head>
+    <body>
+        <button onclick="doThing()">Clicky</button>
+    </body>
+</html>
