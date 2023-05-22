@@ -1,29 +1,78 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>XLSX writer example</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            table,th,td{
+                border: 1px solid black;
+            }
+            th{
+                background: black;
+                color: white;
+                min-width: 5em;
+            }
+            td,caption{
+                background: lightgray;
+            }
+        </style>
         <script src="https://cdn.jsdelivr.net/gh/Tevemadar/ZipStore.js/zipstore.min.js"></script>
-        <script src="xlwriter.js"></script>
+        <script src="xlsxwriter.js"></script>
         <script>
-            function doThing() {
-//                const blob = doXl([["Hello", , "Word!"], , [2, 3.5, "=A3*B3"], "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.".split("")]);
-                const blob = doXl([
-                    ["Trallala", ["Hello", , "Word!"], , [2, 3.5, "=A3*B3"]],
-                    [["Lorem"],[4,5,"=A2*B3-A3*B2"],[6,7]],
-                    ["Ipsum",["Lorem"],"Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.".split("")]
-                ]);
-                const url = URL.createObjectURL(blob);
+            function complete(event) {
+                event.target.value = event.target.value.substring(0, event.target.value.lastIndexOf(".")) + ".xlsx";
+                document.querySelector("button").disabled = event.target.value === ".xlsx";
+            }
+            function save() {
+                const xl = packxlsx(Array.from(document.getElementsByTagName("table")).map(table => [
+                        table.querySelector("caption").innerText, ...Array.from(table.getElementsByTagName("tr")).slice(1)
+                                .map(row => Array.from(row.getElementsByTagName("td")).map(item => {
+                                        item = item.innerText;
+                                        if (!item.length)
+                                            return;
+                                        const f = parseFloat(item);
+                                        return isNaN(f) ? item : f;
+                                    }))
+                    ]));
+                const url = URL.createObjectURL(xl);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "test.xlsx";
+                a.download = document.querySelector("input").value;
                 a.click();
                 URL.revokeObjectURL(url);
             }
+            function add(event) {
+                const tables = document.getElementsByTagName("table").length;
+                let html = tables ? "<br><table>" : "<table>";
+                html += "<caption contenteditable>Sheet" + (tables + 1) + "</caption>";
+                html += "<tr>";
+                for (const h of " ABCDEFGHIJ")
+                    html += "<th>" + h.trim() + "</th>";
+                html += "</tr>";
+                for (let i = 1; i <= 10; i++) {
+                    let row = "<tr><th>" + i + "</th>";
+                    for (let j = 0; j < 10; j++)
+                        row += "<td contenteditable></td>";
+                    row += "</tr>";
+                    html += row;
+                }
+                html += "</table>";
+                event.target.insertAdjacentHTML("beforebegin", html);
+            }
+            function startup() {
+                add({target: document.getElementsByTagName("button")[1]});
+                const cells = document.getElementsByTagName("td");
+                cells[0].innerText = "Hello";
+                cells[2].innerText = "World!";
+                cells[20].innerText = "10";
+                cells[21].innerText = "20";
+                cells[22].innerText = "=A3*B3";
+            }
         </script>
     </head>
-    <body>
-        <button onclick="doThing()">Clicky</button>
+    <body onload="startup()">
+        <input value=".xlsx" oninput="complete(event)"> <button onclick="save()" disabled>Save</button><br>
+        <button onclick="add(event)">Add</button>
     </body>
 </html>

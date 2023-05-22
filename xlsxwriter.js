@@ -5,7 +5,6 @@ const ct_head = `${xml_head}
 <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
 <Default Extension="xml" ContentType="application/xml"/>
 <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>`;
-//<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
 const ct_tail = '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>\
 </Types>';
 const rels_fn = "_rels/.rels";
@@ -17,16 +16,13 @@ const xlrels_fn = "xl/_rels/workbook.xml.rels";
 const xlrels_head = `${xml_head}
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 <Relationship Id="r0" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>`;
-//<Relationship Id="r1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
 const xlrels_tail = "</Relationships>";
 const wb_fn = "xl/workbook.xml";
 const wb_head = `${xml_head}
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x15" xmlns:x15="http://schemas.microsoft.com/office/spreadsheetml/2010/11/main">
 <sheets>`;
-//<sheet name="Sheet1" sheetId="1" r:id="r1"/>
 const wb_tail = "</sheets>\
 </workbook>";
-//const sh_fn = "xl/worksheets/sheet1.xml";
 const sh_head = `${xml_head}
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 <sheetData>`;
@@ -37,23 +33,23 @@ const st_head = `${xml_head}
 <sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">`;
 const st_tail = "</sst>";
 
-function doXl(sheets) {
+function packxlsx(sheets) {
     let ct_dt = ct_head;
     let xlrels_dt = xlrels_head;
     let wb_dt = wb_head;
 
     const string_table = [];
     const sheet_xmls = [];
-    
-    for(let i = 0; i < sheets.length; i++) {
-        ct_dt += `<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`;
-        xlrels_dt += `<Relationship Id="r${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`;
+
+    for (let i = 0; i < sheets.length; i++) {
+        ct_dt += `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`;
+        xlrels_dt += `<Relationship Id="r${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`;
         let sheet = sheets[i];
-        if(typeof sheet[0] === "string") {
-            wb_dt += `<sheet name="${sheet[0]}" sheetId="${i+1}" r:id="r${i+1}"/>`;
+        if (typeof sheet[0] === "string") {
+            wb_dt += `<sheet name="${sheet[0]}" sheetId="${i + 1}" r:id="r${i + 1}"/>`;
             sheet = sheet.slice(1);
         } else {
-            wb_dt += `<sheet name="Sheet${i+1}" sheetId="${i+1}" r:id="r${i+1}"/>`;
+            wb_dt += `<sheet name="Sheet${i + 1}" sheetId="${i + 1}" r:id="r${i + 1}"/>`;
         }
 
         let sheet_data = "";
@@ -79,7 +75,7 @@ function doXl(sheets) {
                         sheet_data += `"><f>${cell.substring(1)}</f>`;
                     else {
                         let idx = string_table.indexOf(cell);
-                        if(idx === -1) {
+                        if (idx === -1) {
                             idx = string_table.length;
                             string_table.push(cell);
                         }
@@ -101,8 +97,7 @@ function doXl(sheets) {
         {name: rels_fn, date, data: te.encode(rels_dt)},
         {name: xlrels_fn, date, data: te.encode(xlrels_dt)},
         {name: wb_fn, date, data: te.encode(wb_dt)},
-        //{name: sh_fn, date, data: te.encode(sh_head + sheet_data + sh_tail)},
-        ...sheet_xmls.map((xml,idx)=>({name: `xl/worksheets/sheet${idx+1}.xml`, date, data: te.encode(xml)})),
+        ...sheet_xmls.map((xml, idx) => ({name: `xl/worksheets/sheet${idx + 1}.xml`, date, data: te.encode(xml)})),
         {name: st_fn, date, data: te.encode(st_head + string_table.map(s => `<si><t>${s}</t></si>`).join("") + st_tail)}
     ]);
 }
